@@ -1,0 +1,1306 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>hbd yanski</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      :root {
+        --pink: #f43f7a;
+        --pink2: #ff85ab;
+        --pink3: #ffcad9;
+        --bg: #f8f5f3;
+        --white: #ffffff;
+        --text: #161010;
+        --sub: #6b5057;
+        --border: rgba(0, 0, 0, 0.07);
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        overflow: hidden;
+      }
+
+      /* ─── LOCK ─── */
+      #lock {
+        position: fixed;
+        inset: 0;
+        background: #0c0a0b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 400;
+        transition:
+          opacity 0.55s ease,
+          transform 0.55s ease;
+      }
+      #lock.out {
+        opacity: 0;
+        transform: scale(0.96);
+        pointer-events: none;
+      }
+      .l-date {
+        font-size: 48px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -2px;
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+      .l-age {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--pink2);
+        margin-bottom: 68px;
+      }
+      .fp-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 13px;
+        cursor: pointer;
+      }
+      .fp-ring {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: border-color 0.3s;
+      }
+      .fp-ring::before {
+        content: "";
+        position: absolute;
+        inset: -9px;
+        border-radius: 50%;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+      }
+      .fp-ring.go {
+        border-color: rgba(244, 63, 122, 0.55);
+      }
+      .fp-ring.go::before {
+        border-color: rgba(244, 63, 122, 0.18);
+        inset: -17px;
+      }
+      .fp-ring.ok {
+        border-color: var(--pink);
+      }
+      .fp-svg {
+        width: 26px;
+        height: 26px;
+        stroke: rgba(255, 255, 255, 0.22);
+        fill: none;
+        stroke-width: 1.2;
+        stroke-linecap: round;
+        transition: stroke 0.3s;
+      }
+      .fp-ring.go .fp-svg,
+      .fp-ring.ok .fp-svg {
+        stroke: var(--pink);
+      }
+      .fp-bar {
+        width: 70px;
+        height: 1.5px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 1px;
+        overflow: hidden;
+        margin-top: -5px;
+      }
+      .fp-fill {
+        height: 100%;
+        width: 0;
+        background: var(--pink);
+        transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .fp-hint {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.18);
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+      }
+
+      /* ─── SCROLL CONTAINER ─── */
+      #app {
+        position: fixed;
+        inset: 0;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease 0.2s;
+        background: var(--bg);
+      }
+      #app.in {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .page {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 0 20px 120px;
+      }
+
+      /* ─── TOPBAR ─── */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 0 24px;
+      }
+      .topbar-tag {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--sub);
+      }
+      .mpill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 13px;
+        border-radius: 100px;
+        border: 1px solid var(--border);
+        background: var(--white);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--sub);
+        cursor: pointer;
+        user-select: none;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s,
+          color 0.2s;
+      }
+      .mpill:active {
+        transform: scale(0.94);
+      }
+      .mpill.on {
+        border-color: var(--pink);
+        color: var(--pink);
+        box-shadow: 0 0 0 3px rgba(244, 63, 122, 0.08);
+      }
+      .mpill svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+      }
+      .eq {
+        display: none;
+        gap: 2px;
+        align-items: flex-end;
+        height: 11px;
+      }
+      .mpill.on .eq {
+        display: flex;
+      }
+      .mpill.on .ni {
+        display: none;
+      }
+      .eb {
+        width: 2px;
+        border-radius: 1px;
+        background: var(--pink);
+        animation: eq var(--d) ease-in-out infinite alternate;
+      }
+      @keyframes eq {
+        from {
+          height: 2px;
+        }
+        to {
+          height: var(--h);
+        }
+      }
+
+      /* ─── CAKE ─── */
+      .cake-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+      .cake-svg {
+        overflow: visible;
+        cursor: pointer;
+      }
+      .tier-bot,
+      .tier-top,
+      .candles-g,
+      .flames-g,
+      .sparkles-g {
+        opacity: 0;
+        transform: translateY(16px);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+      .tier-bot.show,
+      .tier-top.show,
+      .candles-g.show,
+      .flames-g.show,
+      .sparkles-g.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @keyframes flicker {
+        0%,
+        100% {
+          transform: scaleX(1) scaleY(1) translateY(0);
+        }
+        30% {
+          transform: scaleX(0.7) scaleY(1.2) translateY(-2px) rotate(-5deg);
+        }
+        60% {
+          transform: scaleX(1.15) scaleY(0.82) rotate(3deg);
+        }
+      }
+      .fl {
+        animation: flicker 1.4s ease-in-out infinite;
+        transform-origin: 50% 100%;
+      }
+      .fl2 {
+        animation: flicker 1.05s ease-in-out infinite 0.2s;
+        transform-origin: 50% 100%;
+      }
+      .fl3 {
+        animation: flicker 1.75s ease-in-out infinite 0.5s;
+        transform-origin: 50% 100%;
+      }
+      .flame-out {
+        animation: blowOut 0.35s ease forwards !important;
+      }
+      @keyframes blowOut {
+        0% {
+          opacity: 1;
+          transform: scaleX(1.3) scaleY(0.6) translateY(-4px);
+        }
+        100% {
+          opacity: 0;
+          transform: scaleX(0.2) scaleY(2) translateY(-12px);
+        }
+      }
+      .cake-hint {
+        font-size: 11px;
+        color: var(--sub);
+        margin-top: 6px;
+        letter-spacing: 0.2px;
+        opacity: 1;
+        transition: opacity 0.4s;
+      }
+      .cake-hint.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .blown-msg {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pink);
+        margin-top: 8px;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        text-align: center;
+      }
+      .blown-msg.show {
+        opacity: 1;
+      }
+
+      /* ─── HBD BLOCK ─── */
+      .hbd-wrap {
+        margin-bottom: 24px;
+      }
+      .hbd-eye {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--sub);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 7px;
+      }
+      .hbd-eye::before {
+        content: "";
+        width: 12px;
+        height: 1px;
+        background: var(--pink);
+        flex-shrink: 0;
+      }
+      .hbd-title {
+        font-size: 40px;
+        font-weight: 700;
+        letter-spacing: -1.5px;
+        line-height: 1;
+        color: var(--text);
+        margin-bottom: 2px;
+      }
+      .hbd-title .p {
+        color: var(--pink);
+      }
+      .hbd-name {
+        font-size: 40px;
+        font-weight: 700;
+        letter-spacing: -1.5px;
+        line-height: 1;
+        color: var(--text);
+        margin-bottom: 10px;
+      }
+      .hbd-sub {
+        font-size: 14px;
+        color: var(--sub);
+        line-height: 1.6;
+      }
+
+      /* ─── CARDS ─── */
+      .card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px 18px;
+        margin-bottom: 12px;
+      }
+      .card-tag {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--pink);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 11px;
+      }
+      .card-tag::before {
+        content: "";
+        width: 10px;
+        height: 1px;
+        background: var(--pink);
+        flex-shrink: 0;
+      }
+      .card-body {
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.72;
+      }
+      .card-body .hl {
+        color: var(--pink);
+        font-style: italic;
+      }
+      .sep {
+        height: 1px;
+        background: var(--border);
+        margin: 13px 0;
+      }
+      .card-muted {
+        font-size: 12px;
+        color: var(--sub);
+        line-height: 1.6;
+      }
+
+      /* ─── FOOTER ─── */
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 32px;
+        font-size: 11px;
+        color: #c0adb2;
+      }
+      .footer .h {
+        color: var(--pink);
+      }
+
+      /* ─── CANVASES ─── */
+      /* All pointer-events:none — hit-test handled at document level */
+      canvas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      #bCv {
+        z-index: 200;
+      }
+      #cCv {
+        z-index: 198;
+      }
+      #pCv {
+        z-index: 199;
+      }
+
+      /* ─── POP TEXT ─── */
+      .pop-txt {
+        position: fixed;
+        pointer-events: none;
+        z-index: 260;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--pink);
+        animation: popTxtAnim 0.9s ease-out forwards;
+        white-space: nowrap;
+      }
+      @keyframes popTxtAnim {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-40px) scale(0.7);
+        }
+      }
+
+      .mn {
+        position: fixed;
+        pointer-events: none;
+        z-index: 250;
+        font-size: 14px;
+        color: var(--pink);
+        animation: mf 1.7s ease-out forwards;
+        opacity: 0;
+      }
+      @keyframes mf {
+        0% {
+          opacity: 0;
+          transform: translateY(0) scale(0.5);
+        }
+        14% {
+          opacity: 1;
+          transform: translateY(-10px) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-60px) scale(0.8) rotate(10deg);
+        }
+      }
+      audio {
+        display: none;
+      }
+
+      /* ─── BALLOON POP HINT ─── */
+      .balloon-hint {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(244, 63, 122, 0.1);
+        border: 1px solid rgba(244, 63, 122, 0.18);
+        border-radius: 100px;
+        padding: 7px 16px;
+        font-size: 11px;
+        color: var(--pink);
+        letter-spacing: 0.3px;
+        z-index: 300;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      .balloon-hint.show {
+        opacity: 1;
+      }
+      .balloon-hint.fade {
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="cCv"></canvas>
+    <canvas id="pCv"></canvas>
+    <canvas id="bCv"></canvas>
+    <audio id="aud" loop></audio>
+
+    <!-- BALLOON HINT -->
+    <div class="balloon-hint" id="balloonHint">tap balon untuk meletus 🎈</div>
+
+    <!-- LOCK -->
+    <div id="lock">
+      <div class="l-date">31 Maret 2000</div>
+      <div class="l-age">26 tahun hari ini 🎂</div>
+      <div class="fp-wrap" id="fpWrap">
+        <div class="fp-ring" id="fpR">
+          <svg class="fp-svg" viewBox="0 0 32 32">
+            <path d="M16 4C9.4 4 4 9.4 4 16s5.4 12 12 12" />
+            <path
+              d="M16 7.5c-4.7 0-8.5 3.8-8.5 8.5s3.8 8.5 8.5 8.5"
+              stroke-dasharray="3 2.2"
+            />
+            <path d="M16 11c-2.8 0-5 2.2-5 5s2.2 5 5 5" />
+            <path d="M16 14.4c-.9 0-1.6.7-1.6 1.6s.7 1.6 1.6 1.6" />
+            <line x1="16" y1="2" x2="16" y2="4.5" />
+            <line x1="16" y1="27.5" x2="16" y2="30" />
+            <line x1="27.5" y1="16" x2="30" y2="16" />
+            <line x1="2" y1="16" x2="4.5" y2="16" />
+          </svg>
+        </div>
+        <div class="fp-bar"><div class="fp-fill" id="fpF"></div></div>
+        <div class="fp-hint" id="fpH">touch to open</div>
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app">
+      <div class="page">
+        <!-- CAKE -->
+        <div class="cake-section" id="cakeSection">
+          <svg
+            id="cakeSvg"
+            class="cake-svg"
+            viewBox="0 0 220 200"
+            width="220"
+            height="200"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g class="tier-bot" id="tierBot">
+              <ellipse
+                cx="110"
+                cy="178"
+                rx="66"
+                ry="9"
+                fill="rgba(244,63,122,0.07)"
+              />
+              <rect
+                x="26"
+                y="118"
+                width="168"
+                height="56"
+                rx="11"
+                fill="#fff4f7"
+              />
+              <rect
+                x="26"
+                y="118"
+                width="168"
+                height="15"
+                rx="7"
+                fill="#ffcad9"
+              />
+              <circle cx="57" cy="130" r="5.5" fill="#f43f7a" />
+              <circle cx="82" cy="124" r="3.5" fill="#ffb3c6" />
+              <circle cx="110" cy="130" r="5.5" fill="#f43f7a" />
+              <circle cx="138" cy="124" r="3.5" fill="#ffb3c6" />
+              <circle cx="163" cy="130" r="5.5" fill="#f43f7a" />
+              <line
+                x1="26"
+                y1="152"
+                x2="194"
+                y2="152"
+                stroke="#ffd6e4"
+                stroke-width="1.2"
+              />
+            </g>
+            <g class="tier-top" id="tierTop">
+              <rect
+                x="52"
+                y="76"
+                width="116"
+                height="46"
+                rx="9"
+                fill="#fff8fa"
+              />
+              <rect
+                x="52"
+                y="76"
+                width="116"
+                height="13"
+                rx="6"
+                fill="#ffb3c6"
+              />
+              <circle cx="76" cy="87" r="4.5" fill="#f43f7a" />
+              <circle cx="99" cy="82.5" r="3" fill="#ffcad9" />
+              <circle cx="121" cy="87" r="4.5" fill="#f43f7a" />
+              <circle cx="144" cy="82.5" r="3" fill="#ffcad9" />
+              <line
+                x1="52"
+                y1="104"
+                x2="168"
+                y2="104"
+                stroke="#ffd6e4"
+                stroke-width="1"
+              />
+            </g>
+            <g class="candles-g" id="candlesG">
+              <rect
+                x="74"
+                y="54"
+                width="10"
+                height="24"
+                rx="3"
+                fill="#ff85ab"
+              />
+              <rect
+                x="74"
+                y="66"
+                width="10"
+                height="12"
+                rx="1.5"
+                fill="#f43f7a"
+              />
+              <rect
+                x="100"
+                y="48"
+                width="10"
+                height="30"
+                rx="3"
+                fill="#ffcad9"
+              />
+              <rect
+                x="100"
+                y="63"
+                width="10"
+                height="15"
+                rx="1.5"
+                fill="#ffd6e4"
+              />
+              <rect
+                x="126"
+                y="54"
+                width="10"
+                height="24"
+                rx="3"
+                fill="#ff85ab"
+              />
+              <rect
+                x="126"
+                y="66"
+                width="10"
+                height="12"
+                rx="1.5"
+                fill="#f43f7a"
+              />
+            </g>
+            <g class="flames-g" id="flamesG">
+              <g class="fl" id="flame1">
+                <ellipse
+                  cx="79"
+                  cy="54"
+                  rx="5"
+                  ry="7.5"
+                  fill="#fcd34d"
+                  opacity=".94"
+                />
+                <ellipse
+                  cx="79"
+                  cy="55.5"
+                  rx="3"
+                  ry="5"
+                  fill="#fb923c"
+                  opacity=".82"
+                />
+                <ellipse
+                  cx="79"
+                  cy="57"
+                  rx="1.4"
+                  ry="2.2"
+                  fill="white"
+                  opacity=".5"
+                />
+              </g>
+              <g class="fl2" id="flame2">
+                <ellipse
+                  cx="105"
+                  cy="48"
+                  rx="5"
+                  ry="7.5"
+                  fill="#fcd34d"
+                  opacity=".94"
+                />
+                <ellipse
+                  cx="105"
+                  cy="49.5"
+                  rx="3"
+                  ry="5"
+                  fill="#fb923c"
+                  opacity=".82"
+                />
+                <ellipse
+                  cx="105"
+                  cy="51"
+                  rx="1.4"
+                  ry="2.2"
+                  fill="white"
+                  opacity=".5"
+                />
+              </g>
+              <g class="fl3" id="flame3">
+                <ellipse
+                  cx="131"
+                  cy="54"
+                  rx="5"
+                  ry="7.5"
+                  fill="#fcd34d"
+                  opacity=".94"
+                />
+                <ellipse
+                  cx="131"
+                  cy="55.5"
+                  rx="3"
+                  ry="5"
+                  fill="#fb923c"
+                  opacity=".82"
+                />
+                <ellipse
+                  cx="131"
+                  cy="57"
+                  rx="1.4"
+                  ry="2.2"
+                  fill="white"
+                  opacity=".5"
+                />
+              </g>
+            </g>
+            <g class="sparkles-g" id="sparklesG">
+              <text x="28" y="70" font-size="11" fill="#f43f7a" opacity=".3">
+                ✦
+              </text>
+              <text x="182" y="75" font-size="9" fill="#f43f7a" opacity=".25">
+                ✦
+              </text>
+              <text x="186" y="58" font-size="7" fill="#f43f7a" opacity=".18">
+                ✦
+              </text>
+              <text x="20" y="104" font-size="6" fill="#f43f7a" opacity=".15">
+                ✦
+              </text>
+            </g>
+          </svg>
+          <div class="cake-hint" id="cakeHint">tap kue untuk tiup lilin 🎂</div>
+          <div class="blown-msg" id="blownMsg">make a wish! 🩷</div>
+        </div>
+
+        <!-- HBD -->
+        <div class="hbd-wrap">
+          <div class="hbd-eye">happy birthday</div>
+          <div class="hbd-title"><span class="p">Selamat</span></div>
+          <div class="hbd-name" id="hbdName">Yanski 🎀</div>
+          <div class="hbd-sub">semoga hari ini jadi yang paling worth it.</div>
+        </div>
+
+        <!-- Message -->
+        <div class="card">
+          <div class="card-tag">pesan</div>
+          <p class="card-body">
+            hari ini semesta ngerayain kamu. semua yang udah kamu lewatin, semua
+            yang bikin kamu jadi <span class="hl">kamu</span> — it's all worth
+            it. semoga tahun ke-26 ini bawa hal-hal yang selama ini kamu doain
+            diem-diem. stay that girl. 🩷
+          </p>
+          <div class="sep"></div>
+          <p class="card-muted">
+            kesehatan · rezeki · orang-orang yang worth your energy ✦
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ════════════════════════════════════════
+       LOCK
+    ════════════════════════════════════════ */
+      let scanning = false;
+
+      // iOS Safari fix: attach both click + touchend on #lock itself
+      // touchend lebih reliable dari touchstart di iOS untuk fixed elements
+      document.getElementById("lock").addEventListener("click", function (e) {
+        e.preventDefault();
+        doScan();
+      });
+      document
+        .getElementById("lock")
+        .addEventListener("touchend", function (e) {
+          e.preventDefault();
+          doScan();
+        });
+
+      function doScan() {
+        if (scanning) return;
+        scanning = true;
+        const r = document.getElementById("fpR");
+        const f = document.getElementById("fpF");
+        const h = document.getElementById("fpH");
+        r.classList.add("go");
+        f.style.width = "100%";
+        h.textContent = "scanning...";
+        if (navigator.vibrate) navigator.vibrate([28, 12, 28]);
+        setTimeout(() => {
+          r.classList.remove("go");
+          r.classList.add("ok");
+          h.textContent = "✓ verified";
+          setTimeout(openApp, 440);
+        }, 1250);
+      }
+
+      function openApp() {
+        document.getElementById("lock").classList.add("out");
+        document.getElementById("app").classList.add("in");
+        setTimeout(() => {
+          document.getElementById("lock").style.display = "none";
+          buildCake();
+          startBalloons();
+          dropConf(window.innerWidth / 2, -20, 90);
+        }, 580);
+      }
+
+      /* ════════════════════════════════════════
+       CAKE
+    ════════════════════════════════════════ */
+      function buildCake() {
+        const steps = [
+          { id: "tierBot", delay: 0 },
+          { id: "tierTop", delay: 300 },
+          { id: "candlesG", delay: 560 },
+          { id: "flamesG", delay: 820 },
+          { id: "sparklesG", delay: 980 },
+        ];
+        steps.forEach((s) =>
+          setTimeout(
+            () => document.getElementById(s.id).classList.add("show"),
+            s.delay,
+          ),
+        );
+        setTimeout(
+          () => dropConf(window.innerWidth / 2, window.innerHeight * 0.38, 35),
+          860,
+        );
+      }
+
+      let candlesBlown = 0;
+      let cakeInteracted = false;
+
+      function blowCandle(n) {
+        const el = document.getElementById("flame" + n);
+        if (!el || el.classList.contains("flame-out")) return;
+        el.classList.remove("fl", "fl2", "fl3");
+        el.classList.add("flame-out");
+        candlesBlown++;
+        if (navigator.vibrate) navigator.vibrate(18);
+        dropConf(window.innerWidth / 2, window.innerHeight * 0.35, 10);
+        if (candlesBlown === 3) {
+          setTimeout(() => {
+            document.getElementById("blownMsg").classList.add("show");
+            document.getElementById("cakeHint").classList.add("hidden");
+            dropConf(window.innerWidth / 2, window.innerHeight * 0.4, 60);
+          }, 200);
+        }
+      }
+
+      function handleCakeTap() {
+        if (!cakeInteracted) {
+          cakeInteracted = true;
+          document.getElementById("cakeHint").classList.add("hidden");
+        }
+        for (let i = 1; i <= 3; i++) {
+          const el = document.getElementById("flame" + i);
+          if (el && !el.classList.contains("flame-out")) {
+            blowCandle(i);
+            break;
+          }
+        }
+      }
+
+      // Cake: click
+      document
+        .getElementById("cakeSvg")
+        .addEventListener("click", handleCakeTap);
+      // Cake: touch — NO stopPropagation so balloon check can still run
+      document.getElementById("cakeSvg").addEventListener(
+        "touchstart",
+        () => {
+          handleCakeTap();
+        },
+        { passive: true },
+      );
+
+      /* ════════════════════════════════════════
+       CANVAS SETUP
+    ════════════════════════════════════════ */
+      const bCv = document.getElementById("bCv"),
+        bX = bCv.getContext("2d");
+      const cCv = document.getElementById("cCv"),
+        cX = cCv.getContext("2d");
+      const pCv = document.getElementById("pCv"),
+        pX = pCv.getContext("2d");
+
+      function resize() {
+        [bCv, cCv, pCv].forEach((c) => {
+          c.width = window.innerWidth;
+          c.height = window.innerHeight;
+        });
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      /* ════════════════════════════════════════
+       BALLOONS
+       — canvases are pointer-events:none
+       — hit-test done at document level
+       — scrolling is NEVER blocked
+    ════════════════════════════════════════ */
+      const BC = [
+        "#f43f7a",
+        "#ff85ab",
+        "#ffcad9",
+        "#ff2d6e",
+        "#ffb3c6",
+        "#ff6b9d",
+        "#f472b6",
+      ];
+      let balls = [];
+      let hintShown = false;
+
+      class Ball {
+        constructor(delay = 0) {
+          this.reset(delay);
+        }
+        reset(delay = 0) {
+          this.x = 30 + Math.random() * (window.innerWidth - 60);
+          this.y = window.innerHeight + 80 + Math.random() * 80;
+          this.vy = -(1.1 + Math.random() * 1.0);
+          this.sw = Math.random() * Math.PI * 2;
+          this.ss = 0.015 + Math.random() * 0.01;
+          this.w = 30 + Math.random() * 22; // wider hit area
+          this.h = this.w * 1.38;
+          this.col = BC[Math.floor(Math.random() * BC.length)];
+          this.alive = true;
+          this.born = Date.now() + delay;
+        }
+        draw(ctx) {
+          if (!this.alive || Date.now() < this.born) return;
+          const { x, y, w, h, col } = this;
+          ctx.save();
+          ctx.globalAlpha = 0.93;
+
+          // body
+          ctx.beginPath();
+          ctx.ellipse(x, y - h * 0.3, w * 0.5, h * 0.5, 0, 0, Math.PI * 2);
+          ctx.fillStyle = col;
+          ctx.fill();
+
+          // shine
+          ctx.beginPath();
+          ctx.ellipse(
+            x - w * 0.13,
+            y - h * 0.5,
+            w * 0.11,
+            h * 0.14,
+            -Math.PI * 0.3,
+            0,
+            Math.PI * 2,
+          );
+          ctx.fillStyle = "rgba(255,255,255,.30)";
+          ctx.fill();
+
+          // knot
+          ctx.beginPath();
+          ctx.ellipse(x, y + h * 0.22, 3, 4.5, 0, 0, Math.PI * 2);
+          ctx.fillStyle = col;
+          ctx.fill();
+
+          // string
+          ctx.beginPath();
+          ctx.moveTo(x, y + h * 0.27);
+          ctx.quadraticCurveTo(x + 7, y + h * 0.5, x - 5, y + h * 0.72);
+          ctx.strokeStyle = "rgba(244,63,122,.28)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+        update() {
+          if (!this.alive || Date.now() < this.born) return;
+          this.sw += this.ss;
+          this.x += Math.sin(this.sw) * 0.45;
+          this.y += this.vy;
+          if (this.y < -this.h - 40) this.alive = false;
+        }
+        // ellipse hit-test on balloon body
+        hit(px, py) {
+          if (!this.alive || Date.now() < this.born) return false;
+          const cx = this.x;
+          const cy = this.y - this.h * 0.3;
+          const rx = this.w * 0.5 + 6; // +6px tolerance for fat fingers
+          const ry = this.h * 0.5 + 6;
+          const dx = px - cx,
+            dy = py - cy;
+          return (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry) < 1;
+        }
+      }
+
+      function startBalloons() {
+        for (let i = 0; i < 12; i++) balls.push(new Ball(i * 270));
+        animBalls();
+        // replenish
+        setInterval(() => {
+          balls = balls.filter((b) => b.alive);
+          while (balls.length < 10) balls.push(new Ball(Math.random() * 800));
+        }, 2000);
+        // show hint after first balloon is visible
+        setTimeout(showBalloonHint, 2000);
+      }
+
+      function animBalls() {
+        bX.clearRect(0, 0, bCv.width, bCv.height);
+        balls.forEach((b) => {
+          b.update();
+          b.draw(bX);
+        });
+        requestAnimationFrame(animBalls);
+      }
+
+      function showBalloonHint() {
+        if (hintShown) return;
+        hintShown = true;
+        const h = document.getElementById("balloonHint");
+        h.classList.add("show");
+        setTimeout(() => h.classList.remove("show"), 3200);
+      }
+
+      /* ════════════════════════════════════════
+       POP PARTICLES
+    ════════════════════════════════════════ */
+      let pops = [];
+      const POP_WORDS = ["pop!", "🎈", "✨", "yay!", "💕"];
+
+      function popBall(b, px, py) {
+        b.alive = false;
+        if (navigator.vibrate) navigator.vibrate([15, 5, 20]);
+
+        // particles
+        for (let i = 0; i < 26; i++) {
+          const a = (Math.PI * 2 * i) / 26 + (Math.random() - 0.5) * 0.6;
+          const sp = 2.5 + Math.random() * 7;
+          pops.push({
+            x: px,
+            y: py,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp - 1,
+            col: b.col,
+            life: 1,
+            r: 2.5 + Math.random() * 3.5,
+            dec: 0.03 + Math.random() * 0.025,
+          });
+        }
+
+        // confetti burst
+        dropConf(px, py, 16);
+
+        // floating word
+        const word = POP_WORDS[Math.floor(Math.random() * POP_WORDS.length)];
+        const el = document.createElement("div");
+        el.className = "pop-txt";
+        el.textContent = word;
+        el.style.left = px - 20 + "px";
+        el.style.top = py - 10 + "px";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 900);
+      }
+
+      function animPops() {
+        pX.clearRect(0, 0, pCv.width, pCv.height);
+        pops = pops.filter((p) => p.life > 0);
+        pops.forEach((p) => {
+          pX.save();
+          pX.globalAlpha = p.life;
+          pX.beginPath();
+          pX.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+          pX.fillStyle = p.col;
+          pX.fill();
+          pX.restore();
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.12;
+          p.vx *= 0.97;
+          p.life -= p.dec;
+        });
+        requestAnimationFrame(animPops);
+      }
+      animPops();
+
+      /* ════════════════════════════════════════
+       BALLOON HIT-TEST — document level
+       Canvases are pointer-events:none so
+       scroll is NEVER interrupted.
+    ════════════════════════════════════════ */
+      function checkBalloonHit(cx, cy) {
+        for (const b of balls) {
+          if (b.hit(cx, cy)) {
+            popBall(b, cx, cy);
+            return true;
+          }
+        }
+        return false;
+      }
+
+      document.addEventListener("click", (e) => {
+        checkBalloonHit(e.clientX, e.clientY);
+      });
+
+      document.addEventListener(
+        "touchstart",
+        (e) => {
+          // passive:true — never blocks scroll
+          const t = e.changedTouches[0];
+          checkBalloonHit(t.clientX, t.clientY);
+        },
+        { passive: true },
+      );
+
+      /* ════════════════════════════════════════
+       CONFETTI
+    ════════════════════════════════════════ */
+      let confs = [];
+      const CC = [
+        "#f43f7a",
+        "#ffb3c6",
+        "#ffd6e4",
+        "#ff2d6e",
+        "#fff",
+        "#fcd34d",
+        "#ff85ab",
+      ];
+
+      function dropConf(ox, oy, n) {
+        for (let i = 0; i < n; i++) {
+          confs.push({
+            x: ox + (Math.random() - 0.5) * 60,
+            y: oy,
+            vx: (Math.random() - 0.5) * 5,
+            vy: Math.random() * 3 + 1,
+            col: CC[Math.floor(Math.random() * CC.length)],
+            w: 5 + Math.random() * 8,
+            h: 3 + Math.random() * 4,
+            rot: Math.random() * Math.PI * 2,
+            rv: (Math.random() - 0.5) * 0.22,
+            life: 1,
+          });
+        }
+      }
+
+      function animConfs() {
+        cX.clearRect(0, 0, cCv.width, cCv.height);
+        confs = confs.filter((c) => c.y < cCv.height + 20 && c.life > 0);
+        confs.forEach((c) => {
+          cX.save();
+          cX.translate(c.x, c.y);
+          cX.rotate(c.rot);
+          cX.globalAlpha = Math.min(c.life, 1);
+          cX.fillStyle = c.col;
+          cX.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+          cX.restore();
+          c.x += c.vx;
+          c.y += c.vy;
+          c.rot += c.rv;
+          c.vy += 0.055;
+          c.vx *= 0.99;
+          if (c.y > cCv.height - 80) c.life -= 0.04;
+        });
+        requestAnimationFrame(animConfs);
+      }
+      animConfs();
+
+      /* ════════════════════════════════════════
+       MUSIC
+    ════════════════════════════════════════ */
+      let aCtx = null,
+        playing = false;
+
+      function toggleMusic() {
+        const btn = document.getElementById("mBtn");
+        const lbl = document.getElementById("mLbl");
+        const aud = document.getElementById("aud");
+        if (!playing) {
+          if (aud.src && aud.src !== window.location.href)
+            aud.play().catch(() => {});
+          else playMelody();
+          btn.classList.add("on");
+          lbl.textContent = "playing";
+          playing = true;
+          spawnNote();
+        } else {
+          aud.pause();
+          if (aCtx) aCtx.suspend();
+          btn.classList.remove("on");
+          lbl.textContent = "musik";
+          playing = false;
+        }
+      }
+
+      function playMelody() {
+        if (!aCtx)
+          aCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (aCtx.state === "suspended") aCtx.resume();
+        const g = aCtx.createGain();
+        g.gain.value = 0.06;
+        g.connect(aCtx.destination);
+        const N = [
+          261, 261, 293, 261, 349, 330, 0, 261, 261, 293, 261, 392, 349, 0, 261,
+          261, 523, 440, 349, 330, 293, 0, 466, 466, 440, 349, 392, 349,
+        ];
+        const D = 0.37;
+        let t = aCtx.currentTime + 0.08;
+        function loop() {
+          N.forEach((f, i) => {
+            if (!f) return;
+            const o = aCtx.createOscillator();
+            const e = aCtx.createGain();
+            o.type = "sine";
+            o.frequency.value = f;
+            e.gain.setValueAtTime(0, t + i * D);
+            e.gain.linearRampToValueAtTime(0.45, t + i * D + 0.02);
+            e.gain.exponentialRampToValueAtTime(0.001, t + i * D + D * 0.87);
+            o.connect(e);
+            e.connect(g);
+            o.start(t + i * D);
+            o.stop(t + i * D + D);
+          });
+          t += N.length * D;
+          setTimeout(loop, (N.length * D - 0.3) * 1000);
+        }
+        loop();
+      }
+
+      function spawnNote() {
+        if (!playing) return;
+        const icons = ["♪", "♫", "♩", "♬"];
+        const el = document.createElement("div");
+        el.className = "mn";
+        el.textContent = icons[Math.floor(Math.random() * icons.length)];
+        const b = document.getElementById("mBtn").getBoundingClientRect();
+        el.style.left =
+          b.left + b.width / 2 - 7 + (Math.random() - 0.5) * 16 + "px";
+        el.style.top = b.top - 5 + "px";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1700);
+        setTimeout(spawnNote, 680 + Math.random() * 600);
+      }
+    </script>
+  </body>
+</html>
